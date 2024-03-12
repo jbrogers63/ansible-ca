@@ -1,0 +1,36 @@
+== Quickstart
+
+:Author: Jeff Rogers
+:Email: jbrogers63@gmail.com
+
+.Clone the repo and run the bootstrap script to setup:
+[source,bash]
+git clone https://github.com/jbrogers63/ansible-ca
+cd ansible-ca
+bash scripts/bootstrap.sh
+
+.Alternatively, give your CA a name (useful to keep a root CA separate from intermediate CAs):
+[source,bash]
+CA="Root CA" bash scripts/bootstrap.sh
+
+== Requirements
+
+To generate certificates on remote hosts, the following dependency needs to be installed:
+
+- cryptography python package
+
+.On Debian/Ubuntu and alternatives:
+[source,bash]
+apt install python3-cryptography
+
+.On RedHat and alternatives:
+[source,bash]
+dnf install python3-cryptography
+
+.On FreeBSD:
+[source,bash]
+pkg install security/py-cryptography
+
+.On OpenBSD:
+[source,bash]
+pkg_add security/py-cryptography
