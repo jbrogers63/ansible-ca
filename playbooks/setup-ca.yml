@@ -1,5 +1,5 @@
 ---
-- name: Initialize Root Certificate Authority
+- name: Initialize Certificate Authority
   hosts: localhost
   gather_facts: no
   roles:
