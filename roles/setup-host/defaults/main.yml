@@ -1,0 +1,5 @@
+debug: False
+not_before: "-1d"
+not_after: "+364d"
+san_patterns:
+  - "DNS:{{ ansible_fqdn }}"

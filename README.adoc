@@ -62,3 +62,19 @@ pkg install security/py-cryptography
 .On OpenBSD:
 [source,bash]
 pkg_add security/py-cryptography
+
+
+== Customizing the CA
+
+All variables that need to be overridden can be placed in the inventory/group_vars/all file.  For example, if additional subjectAlternativeNames are needed, add them as a list to inventory/group_vars/all:
+
+[source,yaml]
+san_patterns:
+  - "DNS:{{ ansible_fqdn }}"
+  - "DNS:{{ ansible_default_ipv4.address }}"
+
+.By default, the following variables are pre-configured:
+* ansible_fqdn var is already added to the san_patterns list.
+* not_before is set to "yesterday" (-1 day from today)
+* not after is set to the same day one year from now (+364 days from today)
+

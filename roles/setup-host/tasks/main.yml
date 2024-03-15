@@ -1,0 +1,41 @@
+---
+- name: Create private key for host
+  openssl_privatekey:
+    path: "/etc/ssl/{{ ansible_hostname }}.key"
+  register: host_key
+
+- name: Create CSR
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: "{{ host_key.filename }}"
+    common_name: "{{ ansible_hostname }}"
+    subject_alt_name: "{{ san_patterns }}"
+    organization_name: "{{ ca.organization_name }}"
+    country_name: "US"
+    use_common_name_for_san: false
+  delegate_to: "{{ ansible_host }}"
+  register: host_csr
+
+- name: Write certificate request file to host
+  copy:
+    dest: "/etc/ssl/{{ ansible_hostname }}.csr"
+    content: "{{ host_csr.csr }}"
+  delegate_to: "{{ ansible_host }}"
+  when: host_csr is changed
+
+- name: Sign Host CSR
+  community.crypto.x509_certificate_pipe:
+    csr_content: "{{ host_csr.csr }}"
+    provider: ownca
+    ownca_path: "{{ ca.path }}/ca.crt"
+    ownca_privatekey_path: "{{ ca.path }}/ca.key"
+    ownca_not_after: "{{ not_after }}"
+    ownca_not_before: "{{ not_before }}"
+  register: host_cert
+  delegate_to: localhost
+
+- name: Write certificate file to host
+  copy:
+    dest: "/etc/ssl/{{ ansible_hostname }}.crt"
+    content: "{{ host_cert.certificate }}"
+  delegate_to: "{{ ansible_host }}"
+  when: host_cert is changed
