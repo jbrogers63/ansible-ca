@@ -34,3 +34,32 @@ pkg install security/py-cryptography
 .On OpenBSD:
 [source,bash]
 pkg_add security/py-cryptography
+
+
+== Basic Setup
+
+In order to setup a certificate authority, one needs to add a vars file in
+
+[source,bash]
+inventory/group_vars/all
+
+With the following contents filled in (to match your environment):
+
+[source,yaml]
+---
+ca:
+  path: "/path/to/your/root/ca/folder"
+  common_name: "Example.org Root CA"
+  organization_name: "example.org"
+  email_address: "admin@example.org"
+  country_name: "US"
+  key_usage:
+    - keyCertSign
+  basic_constraints:
+    - "CA:TRUE"
+
+Then, do the following:
+[source,bash]
+bash scripts/setup-ca.sh
+
+That will create a self-signed certificate in the configured directory that can be used to sign certificates.

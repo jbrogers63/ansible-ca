@@ -1,0 +1,6 @@
+---
+- name: Initialize Root Certificate Authority
+  hosts: localhost
+  gather_facts: no
+  roles:
+    - { role: setup-ca }

@@ -1,0 +1,41 @@
+---
+- name: Check for existing CA
+  stat:
+    path: "{{ ca.path }}/ca.crt"
+  register: ca_exists
+
+- name: Stop if CA is setup
+  fail:
+    msg: "CA is already setup."
+  when: ca_exists.stat.exists
+
+- name: Create root ca path, if it doesn't exist
+  file:
+    path: "{{ ca.path }}"
+    state: directory
+
+- name: Create ca Key
+  openssl_privatekey:
+    path: "{{ ca.path }}/ca.key"
+  register: ca_key
+
+- name: Create ca CSR
+  openssl_csr:
+    path: "{{ ca.path }}/ca.csr"
+    privatekey_path: "{{ ca_key.filename }}"
+    common_name: "{{ ca.common_name }}"
+    organization_name: "{{ ca.organization_name }}"
+    email_address: "{{ ca.email_address }}"
+    country_name: "{{ ca.country_name }}"
+    key_usage: "{{ ca.key_usage }}"
+    basic_constraints: "{{ ca.basic_constraints }}"
+    use_common_name_for_san: false
+  register: ca_csr
+
+- name: Sign the ca CSR
+  openssl_certificate:
+    path: "{{ ca.path }}/ca.crt"
+    csr_path: "{{ ca_csr.filename }}"
+    privatekey_path: "{{ ca_key.filename }}"
+    provider: selfsigned
+  register: ca_crt
