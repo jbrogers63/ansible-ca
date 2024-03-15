@@ -13,29 +13,6 @@ bash scripts/bootstrap.sh
 [source,bash]
 CA="Root CA" bash scripts/bootstrap.sh
 
-== Requirements
-
-To generate certificates on remote hosts, the following dependency needs to be installed:
-
-- cryptography python package
-
-.On Debian/Ubuntu and alternatives:
-[source,bash]
-apt install python3-cryptography
-
-.On RedHat and alternatives:
-[source,bash]
-dnf install python3-cryptography
-
-.On FreeBSD:
-[source,bash]
-pkg install security/py-cryptography
-
-.On OpenBSD:
-[source,bash]
-pkg_add security/py-cryptography
-
-
 == Basic Setup
 
 In order to setup a certificate authority, one needs to add a vars file in
@@ -63,3 +40,25 @@ Then, do the following:
 bash scripts/setup-ca.sh
 
 That will create a self-signed certificate in the configured directory that can be used to sign certificates.
+
+== Requirements
+
+To generate certificates on remote hosts, the following dependency needs to be installed:
+
+- cryptography python package
+
+.On Debian/Ubuntu and alternatives:
+[source,bash]
+apt install python3-cryptography
+
+.On RedHat and alternatives:
+[source,bash]
+dnf install python3-cryptography
+
+.On FreeBSD:
+[source,bash]
+pkg install security/py-cryptography
+
+.On OpenBSD:
+[source,bash]
+pkg_add security/py-cryptography
