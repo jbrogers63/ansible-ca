@@ -1,25 +1,38 @@
 ---
+- name: Create certificate folder
+  file:
+    path: "{{ cert_path }}"
+    state: directory
+    mode: 0755
+
+- name: Check for existing key
+  stat:
+    path: "{{ cert_path }}/{{ ansible_hostname }}.key"
+  register: key_status
+
+# When the key doesn't exist, create it.
 - name: Create private key for host
   openssl_privatekey:
-    path: "/etc/ssl/{{ ansible_hostname }}.key"
-  register: host_key
+    path: "{{ cert_path }}/{{ ansible_hostname }}.key"
+  #register: host_key
+  when: not key_status.stat.exists
 
 - name: Create CSR
   community.crypto.openssl_csr_pipe:
-    privatekey_path: "{{ host_key.filename }}"
+    privatekey_path: "{{ cert_path }}/{{ ansible_hostname }}.key"
     common_name: "{{ ansible_hostname }}"
     subject_alt_name: "{{ san_patterns }}"
     organization_name: "{{ ca.organization_name }}"
     country_name: "US"
     use_common_name_for_san: false
-  delegate_to: "{{ ansible_host }}"
+  delegate_to: "{{ ansible_fqdn }}"
   register: host_csr
 
 - name: Write certificate request file to host
   copy:
-    dest: "/etc/ssl/{{ ansible_hostname }}.csr"
+    dest: "{{ cert_path }}/{{ ansible_hostname }}.csr"
     content: "{{ host_csr.csr }}"
-  delegate_to: "{{ ansible_host }}"
+  delegate_to: "{{ ansible_fqdn }}"
   when: host_csr is changed
 
 - name: Sign Host CSR
@@ -35,7 +48,13 @@
 
 - name: Write certificate file to host
   copy:
-    dest: "/etc/ssl/{{ ansible_hostname }}.crt"
+    dest: "{{ cert_path }}/{{ ansible_hostname }}.crt"
     content: "{{ host_cert.certificate }}"
-  delegate_to: "{{ ansible_host }}"
+  delegate_to: "{{ ansible_fqdn }}"
   when: host_cert is changed
+
+- name: Copy up ca.crt
+  copy:
+    src: "{{ ca.path }}/ca.crt"
+    dest: "{{ cert_path }}/ca.crt"
+    mode: 0644

@@ -1,6 +1,6 @@
 ---
 - name: Create TLS credentials on host
-  hosts: localhost
+  hosts: "{{ target }}"
   gather_facts: yes
   become: yes
   become_user: root

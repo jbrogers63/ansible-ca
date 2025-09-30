@@ -3,9 +3,10 @@
 :Author: Jeff Rogers
 :Email: jbrogers63@gmail.com
 
-.Clone the repo and run the bootstrap script to setup:
+.Download a release version, unpack it, and run the bootstrap script to setup:
 [source,bash]
-git clone https://github.com/jbrogers63/ansible-ca
+wget https://github.com/jbrogers63/ansible-ca/archive/refs/tags/ansible-ca-0.1.0.tar.gz
+tar -xf ansible-ca-0.1.0.tar.gz
 cd ansible-ca
 bash scripts/bootstrap.sh
 
@@ -34,12 +35,28 @@ ca:
     - keyCertSign
   basic_constraints:
     - "CA:TRUE"
+cert_path: "/etc/ssl/mycerts"
+
+Create a hosts file in:
+
+[source,ini]
+----
+[all]
+host1.local
+host2.local
+host3.local
+----
 
 Then, do the following:
 [source,bash]
 bash scripts/setup-ca.sh
 
 That will create a self-signed certificate in the configured directory that can be used to sign certificates.
+
+Create individual host certificates like so:
+
+[source,bash]
+bash scripts/setup-host.sh -H host1.local
 
 == Requirements
 
